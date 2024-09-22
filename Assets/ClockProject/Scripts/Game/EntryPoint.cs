@@ -1,6 +1,8 @@
 ﻿using Clock.Controller;
 using Clock.Model;
+using Clock.Services.TimerService;
 using Clock.View;
+using R3;
 using UnityEngine;
 
 namespace Game
@@ -8,8 +10,6 @@ namespace Game
     public class EntryPoint : MonoBehaviour
     {
         [SerializeField] private ClockView _clockView;
-        private ClockController _clockController;
-        private ClockModel _clockModel;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void AutostartGame()
@@ -24,6 +24,9 @@ namespace Game
             ClockController clockController = new ClockController(clockModel);
             _clockView.Construct(clockController);
             await clockController.SynchronizeTime();
+            TimerService timerService = new TimerService();
+            timerService.StartTimer(clockModel.CurrentTime);
+            timerService.DateTimeObservable.Subscribe(newValue => clockController.UpdateTime(newValue));
         }
     }
 }
