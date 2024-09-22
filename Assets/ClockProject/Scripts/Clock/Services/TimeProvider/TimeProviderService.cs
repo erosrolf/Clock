@@ -1,12 +1,12 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 
-namespace Clock.Services
+namespace Clock.Services.TimeProvider
 {
     /// <summary>
     /// Class for managing the retrieval of the current time using an <see cref="ITimeProvider"/>.
     /// </summary>
-    public class TimeService
+    public class TimeProviderService
     {
         private ITimeProvider _timeProvider;
         
@@ -14,7 +14,7 @@ namespace Clock.Services
         /// Constructor for <see cref="TimeManager"/>.
         /// </summary>
         /// <param name="timeProvider">An instance of <see cref="ITimeProvider"/> for retrieving the time.</param>
-        public TimeService(ITimeProvider timeProvider)
+        public TimeProviderService(ITimeProvider timeProvider)
         {
             _timeProvider = timeProvider;
         }

@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Clock.Services
+namespace Clock.Services.TimeProvider
 {
     [Serializable]
     public class YandexTimeResponse

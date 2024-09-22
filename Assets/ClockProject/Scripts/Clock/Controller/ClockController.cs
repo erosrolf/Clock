@@ -1,6 +1,6 @@
 ﻿using System;
 using Clock.Model;
-using Clock.Services;
+using Clock.Services.TimeProvider;
 using Cysharp.Threading.Tasks;
 
 namespace Clock.Controller
@@ -9,18 +9,18 @@ namespace Clock.Controller
     {
         public event Action<DateTime> TimeUpdated;
         
-        private TimeService _timeService;
+        private TimeProviderService _timeProviderService;
         private ClockModel _clockModel;
 
         public ClockController(ClockModel clockModel)
         {
             _clockModel = clockModel;
-            _timeService = new TimeService(new YandexTimeProvider());
+            _timeProviderService = new TimeProviderService(new YandexTimeProvider());
         }
 
         public async UniTask SynchronizeTime()
         {
-            UpdateTime(await _timeService.GetCurrentTimeAsync());
+            UpdateTime(await _timeProviderService.GetCurrentTimeAsync());
         }
         public void UpdateTime(DateTime newTime)
         {

@@ -1,7 +1,7 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 
-namespace Clock.Services
+namespace Clock.Services.TimeProvider
 {
     public interface ITimeProvider
     {
