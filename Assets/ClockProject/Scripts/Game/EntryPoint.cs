@@ -24,9 +24,7 @@ namespace Game
             ClockController clockController = new ClockController(clockModel);
             _clockView.Construct(clockController);
             await clockController.SynchronizeTime();
-            TimerService timerService = new TimerService();
-            timerService.StartTimer(clockModel.CurrentTime);
-            timerService.DateTimeObservable.Subscribe(newValue => clockController.UpdateTime(newValue));
+            clockController.StartTimer();
         }
     }
 }
