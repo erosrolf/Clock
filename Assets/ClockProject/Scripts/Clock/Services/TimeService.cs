@@ -1,7 +1,7 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 
-namespace Services.Time
+namespace Clock.Services
 {
     /// <summary>
     /// Class for managing the retrieval of the current time using an <see cref="ITimeProvider"/>.
