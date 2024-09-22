@@ -8,24 +8,29 @@ namespace Clock.View
     public class ClockView : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI _timeText;
-        private TimeController _timeController;
+        private ClockController _clockController;
+        private bool _isConstructed;
 
-        public void Construct(TimeController timeController)
+        public void Construct(ClockController clockController)
         {
-            _timeController = timeController;
+            _clockController = clockController;
+            _isConstructed = true;
+            
+            _clockController.TimeUpdated += UpdateClockText;
         }
         
         private void OnEnable()
         {
-            _timeController.TimeUpdated += UpdateTimeText;
+            if (_isConstructed)
+                _clockController.TimeUpdated += UpdateClockText;
         }
 
         private void OnDisable()
         {
-            _timeController.TimeUpdated -= UpdateTimeText;
+            _clockController.TimeUpdated -= UpdateClockText;
         }
 
-        private void UpdateTimeText(DateTime newTime)
+        private void UpdateClockText(DateTime newTime)
         {
             _timeText.text = newTime.ToString("HH:mm:ss");
         }
