@@ -41,7 +41,6 @@ namespace Clock.Services.TimeCorrection
             if (Regex.IsMatch(inputText, pattern))
             {
                 EventBus.Publish(new TimeEnteredEvent(inputText));
-                gameObject.SetActive(false);
             }
             else
             {
