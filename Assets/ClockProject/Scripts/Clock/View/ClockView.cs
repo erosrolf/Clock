@@ -10,6 +10,7 @@ namespace Clock.View
     {
         [SerializeField] private Transform _hourHand;
         [SerializeField] private Transform _minuteHand;
+        [SerializeField] private Transform _secondHand;
         
         [SerializeField] private TextMeshProUGUI _timeText;
         private ClockController _clockController;
@@ -41,6 +42,7 @@ namespace Clock.View
             UpdateClockText(newTime);
             SetHourHandRotation(newTime);
             SetMinuteHandRotation(newTime);
+            SetSecondHandRotation(newTime);
         }
 
         private void UpdateClockText(DateTime newTime)
@@ -58,6 +60,12 @@ namespace Clock.View
         {
             float minuteAngle = NewTime.Minute * 6 + NewTime.Second * 0.1f;
             _minuteHand.DORotate(new Vector3(0, 180, minuteAngle), 0.5f);
+        }
+        
+        private void SetSecondHandRotation(DateTime newTime)
+        {
+            float secondAngle = newTime.Second * 6;
+            _secondHand.DORotate(new Vector3(0, 180, secondAngle), 0.5f);
         }
     }
 }
