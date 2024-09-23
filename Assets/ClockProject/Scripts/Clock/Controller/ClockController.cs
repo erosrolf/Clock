@@ -13,56 +13,62 @@ namespace Clock.Controller
     {
         public event Action<DateTime> TimeUpdated;
         
-        private ClockModel _clockModel;
-        private TimeProviderService _timeProviderService;
-        private TimerService _timerService;
+        private readonly ClockModel _clockModel;
+        private readonly TimeProviderService _timeProviderService;
+        private readonly TimerService _timerService;
+        private readonly CompositeDisposable _compositeDisposable;
 
-        private TimeSpan _utcOffset;
-        private CompositeDisposable _compositeDisposable;
-        
         public ClockController(ClockModel clockModel)
         {
             _clockModel = clockModel;
             _timeProviderService = new TimeProviderService(new YandexTimeProvider());
             _timerService = new TimerService();
             _compositeDisposable = new CompositeDisposable();
-            
-            EventBus.Subscribe<TimeEnteredEvent>(TimeCorrection);
+
+            SubscribeToEvents();
         }
-        
+
+        /// <summary>
+        /// Synchronizes time from the time provider service.
+        /// </summary>
         public async UniTask SynchronizeTime()
         {
             try
             {
-                _clockModel.ActualTime = await _timeProviderService.GetCurrentTimeAsync(_clockModel.UtcOffset);
+                _clockModel.ActualTime = await _timeProviderService.GetCurrentTimeAsync();
             }
             catch (Exception e)
             {
                 Debug.LogError(e.Message);
-                _clockModel.ActualTime = DateTime.Now;
+                _clockModel.ActualTime = DateTime.Now; // Сохраняем локальное время в случае ошибки
                 Debug.Log("Time was set from local data");
             }
             TimeUpdated?.Invoke(_clockModel.CurrentTime);
         }
-        
+
+        /// <summary>
+        /// Updates the clock offset.
+        /// </summary>
         public void UpdateOffset(TimeSpan offset)
         {
             _clockModel.TimeOffset = offset;
             TimeUpdated?.Invoke(_clockModel.CurrentTime);
         }
-        
+
+        /// <summary>
+        /// Starts the clock timer and subscribes to time updates.
+        /// </summary>
         public void StartClock()
         {
             _timerService.StartTimer(_clockModel.ActualTime);
-            _timerService.DateTimeObservable
-                .Subscribe(actualTime =>
-                {
-                    _clockModel.ActualTime = actualTime;
-                    TimeUpdated?.Invoke(_clockModel.CurrentTime);
-                }).AddTo(_compositeDisposable);
-            _timerService.OnHourHasPassed += OnHourHasPassedHandler;
+
+            SubscribeToTimeUpdates(); // Подписываемся на обновление времени
+            _timerService.OnHourHasPassed += OnHourHasPassedHandler; // Подписываемся на событие
         }
 
+        /// <summary>
+        /// Corrections the time based on the entered event.
+        /// </summary>
         private void TimeCorrection(TimeEnteredEvent timeEnteredEvent)
         {
             if (DateTime.TryParse(timeEnteredEvent.TimeString, out DateTime newTime))
@@ -74,8 +80,36 @@ namespace Clock.Controller
                 Debug.Log("Incorrect DateTime: " + timeEnteredEvent.TimeString);
             }
         }
+
         private void OnHourHasPassedHandler()
             => _ = SynchronizeTime();
+
+        /// <summary>
+        /// Subscribes to necessary events.
+        /// </summary>
+        private void SubscribeToEvents()
+        {
+            EventBus.Subscribe<TimeEnteredEvent>(TimeCorrection);
+        }
+
+        /// <summary>
+        /// Subscribes to time updates from the timer service.
+        /// </summary>
+        private void SubscribeToTimeUpdates()
+        {
+            _timerService.DateTimeObservable
+                .Subscribe(UpdateTime)
+                .AddTo(_compositeDisposable);
+        }
+
+        /// <summary>
+        /// Updates the time and invokes the TimeUpdated event.
+        /// </summary>
+        private void UpdateTime(DateTime actualTime)
+        {
+            _clockModel.ActualTime = actualTime;
+            TimeUpdated?.Invoke(_clockModel.CurrentTime);
+        }
 
         public void Dispose()
         {

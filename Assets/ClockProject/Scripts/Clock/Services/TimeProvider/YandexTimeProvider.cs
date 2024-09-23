@@ -20,7 +20,7 @@ namespace Clock.Services.TimeProvider
         /// </summary>
         /// <returns>A <see cref="DateTime"/> representing the current date and time.</returns>
         /// <exception cref="Exception">Thrown when there is an error during the request.</exception>
-        public async UniTask<DateTime> GetCurrentTimeAsync(TimeSpan utcOffset = default)
+        public async UniTask<DateTime> GetCurrentTimeAsync()
         {
             using (UnityWebRequest webRequest = UnityWebRequest.Get(Url))
             {
@@ -37,7 +37,6 @@ namespace Clock.Services.TimeProvider
                 YandexTimeResponse result = JsonUtility.FromJson<YandexTimeResponse>(jsonResponse);
                 
                 DateTime dateTime = DateTimeOffset.FromUnixTimeMilliseconds(result.time).DateTime;
-                dateTime += utcOffset;
                 return dateTime;
             }
         }

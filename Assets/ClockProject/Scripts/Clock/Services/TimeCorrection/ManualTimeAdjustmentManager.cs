@@ -6,11 +6,15 @@ using UnityEngine.UI;
 
 namespace Clock.Services.TimeCorrection
 {
+    /// <summary>
+    /// Manages custom time settings mode.
+    /// </summary>
     public class ManualTimeAdjustmentManager : MonoBehaviour
     {
         [SerializeField] private TMPInputValidator _tmpInputValidator;
         [SerializeField] private ToggleButton _activateButton;
 
+        #region MONO
         private void Start()
         {
             _tmpInputValidator.gameObject.SetActive(false);
@@ -27,6 +31,7 @@ namespace Clock.Services.TimeCorrection
             EventBus.Unsubscribe<TimeEnteredEvent>(_ => _activateButton.SetButtonStatus(false));
             _activateButton.OnButtonToggled -= HandleButtonToggled;
         }
+        #endregion
 
         private void HandleButtonToggled(bool isPressed)
         {
