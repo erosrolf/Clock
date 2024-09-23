@@ -6,12 +6,14 @@ namespace Clock.Model
     [Serializable]
     public class ClockModel : ITimeData
     {
-        [SerializeField] private DateTime _currentTime;
-        public DateTime CurrentTime { get => _currentTime; set => _currentTime = value; }
+        public DateTime ActualTime;
+        public TimeSpan TimeOffset;
+        
+        public DateTime CurrentTime => ActualTime + TimeOffset;
 
         public override string ToString()
         {
-            return _currentTime.ToString("HH:mm:ss");
+            return CurrentTime.ToString("HH:mm:ss");
         }
     }
 }

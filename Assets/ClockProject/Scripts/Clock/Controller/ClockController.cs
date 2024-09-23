@@ -2,12 +2,14 @@
 using Clock.Model;
 using Clock.Services.TimeProvider;
 using Clock.Services.TimerService;
+using Clock.Utils.EventBus;
 using Cysharp.Threading.Tasks;
 using R3;
+using UnityEngine;
 
 namespace Clock.Controller
 {
-    public class ClockController
+    public class ClockController : IDisposable
     {
         public event Action<DateTime> TimeUpdated;
         
@@ -15,34 +17,70 @@ namespace Clock.Controller
         private TimeProviderService _timeProviderService;
         private TimerService _timerService;
 
-        private CompositeDisposable _subscriptions;
+        private IDisposable _subscription;
         
         public ClockController(ClockModel clockModel)
         {
             _clockModel = clockModel;
             _timeProviderService = new TimeProviderService(new YandexTimeProvider());
             _timerService = new TimerService();
+            
+            EventBus.Subscribe<TimeEnteredEvent>(TimeCorrection);
+        }
+        
+        public async UniTask SynchronizeTime()
+        {
+            _clockModel.ActualTime = await _timeProviderService.GetCurrentTimeAsync();
+            TimeUpdated?.Invoke(_clockModel.CurrentTime);
+        }
+        
+        public void UpdateOffset(TimeSpan offset)
+        {
+            _clockModel.TimeOffset = offset;
+            TimeUpdated?.Invoke(_clockModel.CurrentTime);
         }
         
         public void StartTimer()
         {
-            _subscriptions?.Dispose();
-            _subscriptions = new CompositeDisposable();
-            _timerService.StartTimer(_clockModel.CurrentTime);
-            _timerService.DateTimeObservable
-                .Subscribe(newValue => UpdateTime(newValue))
-                .AddTo(_subscriptions);
+            _timerService.StartTimer(_clockModel.ActualTime);
         }
 
-        public async UniTask SynchronizeTime()
+        public void StopTimer()
         {
-            UpdateTime(await _timeProviderService.GetCurrentTimeAsync());
+            _timerService.StopTimer();
         }
-        
-        public void UpdateTime(DateTime newTime)
+
+        public void StartUpdateView()
         {
-            _clockModel.CurrentTime = newTime;
-            TimeUpdated?.Invoke(newTime);
+            _subscription?.Dispose();
+            _subscription = _timerService.DateTimeObservable
+                .Subscribe(actualTime =>
+                {
+                    _clockModel.ActualTime = actualTime;
+                    TimeUpdated?.Invoke(_clockModel.CurrentTime);
+                });
+        }
+
+        public void StopUpdateView()
+        {
+            _subscription?.Dispose();
+        }
+
+        private void TimeCorrection(TimeEnteredEvent timeEnteredEvent)
+        {
+            if (DateTime.TryParse(timeEnteredEvent.TimeString, out DateTime newTime))
+            {
+                UpdateOffset(newTime - _clockModel.ActualTime);
+            }
+            else
+            {
+                Debug.Log("Incorrect DateTime: " + timeEnteredEvent.TimeString);
+            }
+        }
+
+        public void Dispose()
+        {
+            EventBus.Unsubscribe<TimeEnteredEvent>(TimeCorrection);
         }
     }
 }

@@ -25,6 +25,7 @@ namespace Game
             _clockView.Construct(clockController);
             await clockController.SynchronizeTime();
             clockController.StartTimer();
+            clockController.StartUpdateView();
         }
     }
 }

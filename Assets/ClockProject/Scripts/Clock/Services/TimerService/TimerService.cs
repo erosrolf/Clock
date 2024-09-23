@@ -9,18 +9,13 @@ namespace Clock.Services.TimerService
     {
         public Observable<DateTime> DateTimeObservable => _currentTimeProperty;
         
-        private ReactiveProperty<DateTime> _currentTimeProperty;
+        private ReactiveProperty<DateTime> _currentTimeProperty = new();
         private CancellationTokenSource _cts;
-        
+
         public void StartTimer(DateTime initialTime)
         {
             _currentTimeProperty = new ReactiveProperty<DateTime>(initialTime);
 
-            if (_cts != null)
-            {
-                StopTimer();
-            }
-            
             _cts = new CancellationTokenSource();
             UpdateTimeAsync(_cts.Token);
         }
@@ -28,6 +23,7 @@ namespace Clock.Services.TimerService
         public void StopTimer()
         {
             _cts?.Cancel();
+            _cts?.Dispose();
             _cts = null;
         }
 
