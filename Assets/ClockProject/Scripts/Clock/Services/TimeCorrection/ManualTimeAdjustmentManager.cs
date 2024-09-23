@@ -1,6 +1,6 @@
 ﻿using System;
-using Clock.Utils;
-using Clock.Utils.EventBus;
+using Utils;
+using Utils.EventBus;
 using UnityEngine;
 using UnityEngine.UI;
 

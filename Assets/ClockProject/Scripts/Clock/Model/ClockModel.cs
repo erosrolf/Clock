@@ -8,6 +8,7 @@ namespace Clock.Model
     {
         public DateTime ActualTime;
         public TimeSpan TimeOffset;
+        public TimeSpan UtcOffset;
         
         public DateTime CurrentTime => ActualTime + TimeOffset;
 

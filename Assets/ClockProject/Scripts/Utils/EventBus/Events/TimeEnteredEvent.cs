@@ -1,4 +1,4 @@
-﻿namespace Clock.Utils.EventBus
+﻿namespace Utils.EventBus
 {
     public class TimeEnteredEvent
     {

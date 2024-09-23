@@ -1,9 +1,8 @@
-﻿using Clock.Controller;
+﻿using System;
+using Clock.Controller;
 using Clock.Model;
-using Clock.Services.TimerService;
 using Clock.View;
 using Cysharp.Threading.Tasks;
-using R3;
 using UnityEngine;
 
 namespace Game
@@ -24,13 +23,25 @@ namespace Game
         {
             _loadingScreen.SetActive(true);
             ClockModel clockModel = new ClockModel();
+            clockModel.UtcOffset = TimeZoneInfo.Local.BaseUtcOffset;
             ClockController clockController = new ClockController(clockModel);
             _clockView.Construct(clockController);
-            await clockController.SynchronizeTime();
+            await TryGetCurrentTime(clockController);
             await UniTask.WaitForSeconds(0.5f);
             _loadingScreen.SetActive(false);
-            clockController.StartTimer();
-            clockController.StartUpdateView();
+            clockController.StartClock();
+        }
+
+        private async UniTask TryGetCurrentTime(ClockController clockController)
+        {
+            try
+            {
+                await clockController.SynchronizeTime();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.Message);
+            }
         }
     }
 }

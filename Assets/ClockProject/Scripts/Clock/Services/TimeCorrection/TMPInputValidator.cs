@@ -3,7 +3,7 @@ using UnityEngine;
 using TMPro;
 using System.Text.RegularExpressions;
 using System.Collections;
-using Clock.Utils.EventBus;
+using Utils.EventBus;
 using UnityEditor;
 using UnityEngine.UI;
 

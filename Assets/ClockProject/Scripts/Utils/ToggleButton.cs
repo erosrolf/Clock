@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Clock.Utils
+namespace Utils
 {
     public class ToggleButton : MonoBehaviour, IPointerDownHandler
     {

@@ -1,5 +1,7 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 namespace Clock.Services.TimeProvider
 {
@@ -18,12 +20,22 @@ namespace Clock.Services.TimeProvider
         {
             _timeProvider = timeProvider;
         }
-        
+
         /// <summary>
         /// Asynchronously retrieves the current time.
         /// </summary>
         /// <returns>A <see cref="DateTime"/> representing the current date and time.</returns>
-        public async UniTask<DateTime> GetCurrentTimeAsync() 
-            => await _timeProvider.GetCurrentTimeAsync();
+        public async UniTask<DateTime> GetCurrentTimeAsync(TimeSpan utcOffset = default)
+        {
+            try
+            {
+                return await _timeProvider.GetCurrentTimeAsync(utcOffset);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.Message);
+                throw;
+            }
+        }
     }
 }

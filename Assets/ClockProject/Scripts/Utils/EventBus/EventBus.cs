@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clock.Utils.EventBus
+namespace Utils.EventBus
 {
     public static class EventBus
     {
