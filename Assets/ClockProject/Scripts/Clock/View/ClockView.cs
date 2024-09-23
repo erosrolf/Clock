@@ -20,7 +20,7 @@ namespace Clock.View
             _clockController = clockController;
             _isConstructed = true;
             
-            _clockController.TimeUpdated += UpdateClockText;
+            _clockController.TimeUpdated += UpdateViews;
             
             _hourHand.localRotation = Quaternion.Euler(0, 0, 90);
         }
@@ -28,30 +28,35 @@ namespace Clock.View
         private void OnEnable()
         {
             if (_isConstructed)
-                _clockController.TimeUpdated += UpdateClockText;
+                _clockController.TimeUpdated += UpdateViews;
         }
 
         private void OnDisable()
         {
-            _clockController.TimeUpdated -= UpdateClockText;
+            _clockController.TimeUpdated -= UpdateViews;
+        }
+
+        public void UpdateViews(DateTime newTime)
+        {
+            UpdateClockText(newTime);
+            SetHourHandRotation(newTime);
+            SetMinuteHandRotation(newTime);
         }
 
         private void UpdateClockText(DateTime newTime)
         {
             _timeText.text = newTime.ToString("HH:mm:ss");
-            SetHourHandRotation(newTime);
-            SetMinuteHandRotation(newTime);
         }
 
-        private void SetHourHandRotation(DateTime time)
+        private void SetHourHandRotation(DateTime newTime)
         {
-            float hourAngle = (time.Hour % 12) * 30 + time.Minute * 0.5f; // Правильный расчет угла
+            float hourAngle = (newTime.Hour % 12) * 30 + newTime.Minute * 0.5f; // Правильный расчет угла
             _hourHand.DORotate(new Vector3(0, 180, hourAngle), 0.5f);
         }
 
-        private void SetMinuteHandRotation(DateTime time)
+        private void SetMinuteHandRotation(DateTime NewTime)
         {
-            float minuteAngle = time.Minute * 6 + time.Second * 0.1f;
+            float minuteAngle = NewTime.Minute * 6 + NewTime.Second * 0.1f;
             _minuteHand.DORotate(new Vector3(0, 180, minuteAngle), 0.5f);
         }
     }
